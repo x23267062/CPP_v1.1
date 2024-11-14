@@ -32,6 +32,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '8723f3efaf59465581cc81a61567355f.vfs.cloud9.us-east-1.amazonaws.com']
 APPEND_SLASH=False
+LOGIN_URL = 'login_view'
 
 CSRF_TRUSTED_ORIGINS = [
     'https://8723f3efaf59465581cc81a61567355f.vfs.cloud9.us-east-1.amazonaws.com']
@@ -129,5 +130,47 @@ STATIC_URL = 'static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
-
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+import environ
+import os
+
+# Load environment variables
+env = environ.Env()
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+
+# AWS Region (from environment variable or default)
+AWS_REGION = env('AWS_REGION', default='us-east-1')
+
+
+
+# Custom Login URL for Django's @login_required decorator
+#LOGIN_URL = 'login_view'
+
+# Optional logging settings for boto3 and botocore debugging
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'boto3': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+        'botocore': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
+}
+
+# Custom Authentication Backend (if using DynamoDB-based authentication)
+#AUTHENTICATION_BACKENDS = ['orders.backends.DynamoDBBackend']
+

@@ -11,3 +11,6 @@ class Order(models.Model):
 
     def __str__(self):
         return f"Order by {self.user.username} from {self.pickup_location} to {self.drop_location}"
+
+
+

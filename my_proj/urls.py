@@ -20,10 +20,15 @@ from orders import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('login/', views.login_view, name='login'),
+#    path('login/', views.login_view, name='login'),
     path('order/', views.place_order, name='place_order'),
     path('order-success/', views.order_success, name='order_success'),
     path('track_home/',views.track_home, name='track_home'),
     path('ship_now/',views.ship_now, name='ship_now'),
+    path('login_view/', views.login_view, name='login_view'),
     path('',views.user_login, name='user_login'),
+    path('order_list/',views.order_list, name='order_list'),
+    path('place_order/', views.place_order, name='place_order'),
+    path('delete/<int:index>/', views.delete, name='delete'),
+    #path('',views.user_login, name='user_login'),
 ]

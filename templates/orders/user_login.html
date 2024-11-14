@@ -95,13 +95,19 @@
                 <section class="login-container">
                     <h2 class="jw-heading-85">Login to TrackItNow</h2>
                     
-                    <form action="track_home/" method="POST" class="jw-form">
+                    <form action="{% url 'login_view' %}" method="POST" class="jw-form">
                         {% csrf_token %}
                         <label for="username" class="jw-element-imagetext-text">Username:</label>
                         <input type="text" id="username" name="username" required class="jw-form-input">
+                        {% if form.username.errors %}
+                        <div class="form-error">{{ form.username.errors.0 }}</div>
+                        {% endif %}
                         
                         <label for="password" class="jw-element-imagetext-text">Password:</label>
                         <input type="password" id="password" name="password" required class="jw-form-input">
+                        {% if form.password.errors %}
+                        <div class="form-error">{{ form.password.errors.0 }}</div>
+                        {% endif %}
                         
                         <button type="submit" class="jw-btn jw-btn--size-default jw-btn--style-flat">
                             Login
