@@ -26,9 +26,11 @@ urlpatterns = [
     path('track_home/',views.track_home, name='track_home'),
     path('ship_now/',views.ship_now, name='ship_now'),
     path('login_view/', views.login_view, name='login_view'),
+    path('signup_view/', views.signup_view, name='signup_view'),
     path('',views.user_login, name='user_login'),
     path('order_list/',views.order_list, name='order_list'),
     path('place_order/', views.place_order, name='place_order'),
     path('delete/<int:index>/', views.delete, name='delete'),
+    path('logout/', views.logout_view, name='logout'),
     #path('',views.user_login, name='user_login'),
 ]

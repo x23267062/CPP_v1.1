@@ -8,7 +8,7 @@
         <p>{{ success_message }}</p>
     </div>
     {% endif %}
-     <form action="{% url 'order_list' %}"  method="POST" class="jw-form-container">
+     <form action="{% url 'place_order' %}"  method="POST" class="jw-form-container">
                                             {% csrf_token %}
                                             <div class="jw-element-form-group">
                                                 <label for="pickup_location" class="jw-element-form-label">Pick location(eir code):</label>

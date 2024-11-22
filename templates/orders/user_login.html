@@ -120,6 +120,30 @@
                 </section>
             </div>
     </main> 
+    <main class="block-content"> 
+            <div  class="main-content">
+                <section class="login-container">
+                    <h2 class="jw-heading-85">Signup to TrackItNow</h2>
+                    
+                    <form action="{% url 'signup_view' %}" method="POST" class="jw-form">
+                        {% csrf_token %}
+                        <label for="username" class="jw-element-imagetext-text">Username:</label>
+                        <input type="text" id="username" name="username" required class="jw-form-input">
+                       
+                        
+                        <label for="password" class="jw-element-imagetext-text">Password:</label>
+                        <input type="password" id="password" name="password" required class="jw-form-input">
+                       
+                        <label for="username" class="jw-element-imagetext-text">Email:</label>
+                        <input type="email" id="email" name="email" required class="jw-form-input">
+                        
+                        <button type="submit" class="jw-btn jw-btn--size-default jw-btn--style-flat">
+                            Signup
+                        </button>
+                    </form>
+                </section>
+            </div>
+    </main> 
     </div>
 
     <!-- Footer -->

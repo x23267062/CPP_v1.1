@@ -5,11 +5,11 @@ from django.contrib import messages
 #from django.contrib.auth.models import User , auth
 from django.http import HttpResponseRedirect
 from django.views.decorators.csrf import csrf_exempt
-
+from .sns import *
 
 
 from django.contrib.auth.models import User  # Django user model for session management
-from django.contrib.auth.decorators import login_required
+#from django.contrib.auth.decorators import login_required
 from .forms import LoginForm, OrderForm
 from .dynamo_db_utils import *
 import logging,json
@@ -17,19 +17,6 @@ import logging,json
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-
-@login_required
-def place_oorder(request):
-    if request.method == 'POST':
-        form = OrderForm(request.POST)
-        if form.is_valid():
-            order = form.save(commit=False)
-            order.user = request.user
-            order.save()
-            return redirect('order_success')
-    else:
-        form = OrderForm()
-    return render(request, 'orders/place_order.html', {'form': form})
 
 def order_success(request):
     return render(request, 'orders/order_success.html')
@@ -40,6 +27,15 @@ def track_home(request):
     return render(request, 'orders/track_home.html', {'username': username})
 
 
+# def login_required(function):
+#     """
+#     Decorator to ensure the user is logged in.
+#     """
+#     def wrapper(request, *args, **kwargs):
+#         if 'username' not in request.session:
+#             return redirect('login_view')  # Redirect to login page if not logged in
+#         return function(request, *args, **kwargs)
+#     return wrapper
 
 def login_view(request):
     if request.method == 'POST':
@@ -55,11 +51,29 @@ def login_view(request):
                 return redirect('track_home')
             else:
                 # Authentication failed, add error message
-                form.add_error(None, "Invalid username or password.")
+                #form.add_error(None, "Invalid username or password.")
                 return render(request, 'orders/user_login.html', {'form': form})
-        else:
-            form = LoginForm()
-            return render(request, 'orders/user_login.html', {'form': form})
+    else:
+        # form = LoginForm()
+        #return redirect('user_login')
+        return render(request, 'orders/user_login.html')
+
+def signup_view(request):
+    if request.method == 'POST':
+        form = LoginForm(request, data=request.POST)
+        if form :
+            username = request.POST.get('username')
+            password = request.POST.get('password')
+            email = request.POST.get('email')
+            add_user('Users', username, email, password, 'us-east-1')
+            topic_arn = create_sns_topic(username)
+            subscribe_to_topic(topic_arn, 'email', email)
+            return render(request, 'orders/user_login.html')
+    else:
+        # form = LoginForm()
+        #return redirect('user_login')
+        return render(request, 'orders/user_login.html')
+
 
 @csrf_exempt
 def ship_now(request):
@@ -73,6 +87,10 @@ def ship_now(request):
         drop_location = values_data.get('drop_location')
         username = request.session.get('username', 'User')
         logger.info("\n\nUser placed order {}".format(pickup_location))
+        email = get_email_from_dynamodb(username)
+        logger.info("\n\nemail {}".format(email))
+        topic_arn = get_topic_by_name(username)
+        #send_order_confirmation_email_via_sns(username, pickup_location, drop_location, topic_arn)
         save_order_to_dynamodb(username, pickup_location, drop_location)
         success_message = "Order placed successfully!"
         logger.info("\n\nUser placed order {}".format(success_message))
@@ -83,7 +101,8 @@ def ship_now(request):
     # else:
     #     logger.info("\n\nUser placed2 order") 
     #     return render(request, 'orders/ship_now.html')
-    
+
+   
 def order_list(request):
     username = request.session.get('username', 'User')
     user_orders = get_user_orders(username)
@@ -120,10 +139,22 @@ def place_order(request):
         #username = request.user.username  # Get the logged-in user's username
         username = request.session.get('username', 'User')
         logger.info("\n\nUser placed order {}".format(pickup_location))
+        email = get_email_from_dynamodb(username)
+        logger.info("\n\nemail {}".format(email))
+        
+        #publish_message(get_topic_by_name('order_notify'), "This is a test message.", subject="Test Subject")
         save_order_to_dynamodb(username, pickup_location, drop_location)
-
+        
+        
         # Add success message
         # messages.success(request, "Order placed successfully!")
         success_message = "Order placed successfully!"
         logger.info("\n\nUser placed order {}".format(success_message))  # Render the form page 
-    return render(request, 'orders/order_success.html', {'success_message': success_message})    
+    return render(request, 'orders/order_success.html', {'success_message': success_message}) 
+    
+def logout_view(request):
+    """
+    Logs out the user by clearing the session data.
+    """
+    request.session.flush()  # Clears all session data for the user
+    return redirect('login_view')  # Redirect to the login page or any other page    

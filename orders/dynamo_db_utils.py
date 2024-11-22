@@ -2,7 +2,7 @@ import boto3
 from botocore.exceptions import ClientError
 import logging
 from werkzeug.security import generate_password_hash
-
+from .sns import *
 
 from werkzeug.security import check_password_hash
 
@@ -102,7 +102,7 @@ def add_user(table_name, username, email, password, region="us-east-1"):
                 'Username': username,
                 'Email': email,
                 'PasswordHash': password_hash,
-                'Delivery location': [],
+                'Drop location': [],
                 'Delivery status': 'Pending',
                 'Pickup location': [],
             }
@@ -171,6 +171,7 @@ def save_order_to_dynamodb(username, pickup_location, drop_location):
             },
             ReturnValues="UPDATED_NEW"  # Returns updated attributes
         )
+        #publish_message(get_topic_by_name('order_notify'), "Order placed successfully", subject="Order confirmation")
         print("Update succeeded:", response['Attributes'])
     except ClientError as e:
         print(f"Error updating item: {e.response['Error']['Message']}")
@@ -190,7 +191,7 @@ def get_user_orders(username):
     logger.info("\n\n\n{}".format(orders))
     return orders
 
-import boto3
+
 
 def remove_element_from_db(username,index):
     """
@@ -247,6 +248,38 @@ def remove_element_from_db(username,index):
 # Usage example:
 #remove_second_element_from_lists('YourTableName', 'Abimanyu')
 
+def get_email_from_dynamodb(username, table_name='Users', region='us-east-1'):
+    """
+    Retrieve the email address of a user from the DynamoDB table.
+
+    Args:
+    - username (str): The username of the user.
+    - table_name (str): The name of the DynamoDB table. Default is 'Users'.
+    - region (str): The AWS region. Default is 'us-east-1'.
+
+    Returns:
+    - str: The email address of the user, or None if the user doesn't exist.
+    """
+    # Initialize the DynamoDB resource
+    dynamodb = boto3.resource('dynamodb', region_name=region)
+    table = dynamodb.Table(table_name)
+
+    try:
+        # Fetch the item based on the username
+        response = table.get_item(Key={'Username': username})
+        item = response.get('Item', None)
+
+        if item:
+            email = item['Email']
+            #email = item.get('Email', None)  # Retrieve the 'Email' field
+            print(f"Email for {username}: {email}")
+            return email
+        else:
+            print(f"User '{username}' not found in table '{table_name}'.")
+            return None
+    except ClientError as e:
+        print(f"Error fetching email: {e.response['Error']['Message']}")
+        return None
 
 def main():
     # Specify table name and AWS region
