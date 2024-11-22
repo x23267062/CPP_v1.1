@@ -218,9 +218,9 @@ def remove_element_from_db(username,index):
             pickup_list = item['Pickup location']
             drop_list = item['Drop location']
 
-            if len(pickup_list) > 1:
+            if len(pickup_list) > 0:
                 del pickup_list[index]  # Remove the second element (index 1)
-            if len(drop_list) > 1:
+            if len(drop_list) > 0:
                 del drop_list[index]  # Remove the second element (index 1)
 
             # Step 3: Update the item in DynamoDB

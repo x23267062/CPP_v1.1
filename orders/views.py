@@ -6,7 +6,7 @@ from django.contrib import messages
 from django.http import HttpResponseRedirect
 from django.views.decorators.csrf import csrf_exempt
 from .sns import *
-
+from .lambda_utils import *
 
 from django.contrib.auth.models import User  # Django user model for session management
 #from django.contrib.auth.decorators import login_required
@@ -90,7 +90,11 @@ def ship_now(request):
         email = get_email_from_dynamodb(username)
         logger.info("\n\nemail {}".format(email))
         topic_arn = get_topic_by_name(username)
+        values_data['username'] = username
+        values_data['topic_arn'] = topic_arn
         #send_order_confirmation_email_via_sns(username, pickup_location, drop_location, topic_arn)
+        logger.info("\n\n\nSending email via lambda {} \n\n\n\n {}".format(values_data,values_json))
+        invoke_lambda(json.dumps(values_data))
         save_order_to_dynamodb(username, pickup_location, drop_location)
         success_message = "Order placed successfully!"
         logger.info("\n\nUser placed order {}".format(success_message))
