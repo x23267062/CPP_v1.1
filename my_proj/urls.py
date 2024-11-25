@@ -20,7 +20,6 @@ from orders import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-#    path('login/', views.login_view, name='login'),
     path('order/', views.place_order, name='place_order'),
     path('order-success/', views.order_success, name='order_success'),
     path('track_home/',views.track_home, name='track_home'),
@@ -32,5 +31,4 @@ urlpatterns = [
     path('place_order/', views.place_order, name='place_order'),
     path('delete/<int:index>/', views.delete, name='delete'),
     path('logout/', views.logout_view, name='logout'),
-    #path('',views.user_login, name='user_login'),
 ]

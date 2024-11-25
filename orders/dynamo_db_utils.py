@@ -11,8 +11,7 @@ from werkzeug.security import check_password_hash
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-def create_dynamodb_table(table_name, region="us-east-1"):
-    """
+"""
     Creates a DynamoDB table for storing user authentication data.
     
     Args:
@@ -21,7 +20,9 @@ def create_dynamodb_table(table_name, region="us-east-1"):
     
     Returns:
     - Table creation status or error message.
-    """
+"""
+def create_dynamodb_table(table_name, region="us-east-1"):
+    
     # Initialize DynamoDB resource
     dynamodb = boto3.resource('dynamodb', region_name=region)
     
@@ -58,7 +59,7 @@ def create_dynamodb_table(table_name, region="us-east-1"):
         table = dynamodb.create_table(
             TableName=table_name,
             KeySchema=key_schema,
-            AttributeDefinitions=attribute_definitions[:1],  # Only 'Username' needed in KeySchema
+            AttributeDefinitions=attribute_definitions[:1],  
             ProvisionedThroughput=provisioned_throughput
         )
         
@@ -66,19 +67,12 @@ def create_dynamodb_table(table_name, region="us-east-1"):
         table.meta.client.get_waiter('table_exists').wait(TableName=table_name)
         
         logger.info(f"Table '{table_name}' created successfully.")
-        # table.put_item(
-        # Item={
-        #     'Delivery location': [],
-        #     'Delivery status': 'Pending',  # This is the list
-        # })
         return table
     
     except ClientError as e:
         logger.error(f"Failed to create table: {e.response['Error']['Message']}")
         return None
 
-
-def add_user(table_name, username, email, password, region="us-east-1"):
     """
     Adds a new user to the DynamoDB table with a hashed password.
     
@@ -88,6 +82,8 @@ def add_user(table_name, username, email, password, region="us-east-1"):
     - email (str): Email of the user.
     - password (str): Plain-text password, which will be hashed before storing.
     """
+def add_user(table_name, username, email, password, region="us-east-1"):
+    
     # Initialize DynamoDB resource
     dynamodb = boto3.resource('dynamodb', region_name=region)
     table = dynamodb.Table(table_name)
@@ -114,15 +110,14 @@ def add_user(table_name, username, email, password, region="us-east-1"):
 
 
 
-# Set up DynamoDB
 
-def authenticate_dynamodb_user(username, password):
     """
     Authenticates a user by checking DynamoDB for the username and verifying the password hash.
     """
+def authenticate_dynamodb_user(username, password):
     try:
-        dynamodb = boto3.resource('dynamodb', region_name='us-east-1')  # Replace with your AWS region
-        user_table = dynamodb.Table('Users')  # Ensure this table exists in DynamoDB
+        dynamodb = boto3.resource('dynamodb', region_name='us-east-1')  
+        user_table = dynamodb.Table('Users')  
         
         if user_table is None:
             raise ValueError("DynamoDB user table is not initialized. Check your DynamoDB resource and table name.")
@@ -145,10 +140,11 @@ def authenticate_dynamodb_user(username, password):
         logging.error(f"Error fetching user: {e}")
         return None
 
-def save_order_to_dynamodb(username, pickup_location, drop_location):
+
     """
     Save or update an order for a user in DynamoDB.
     """
+def save_order_to_dynamodb(username, pickup_location, drop_location):
     try:
         dynamodb = boto3.resource('dynamodb', region_name='us-east-1')  # Replace with your AWS region
         table = dynamodb.Table('Users')
@@ -165,13 +161,12 @@ def save_order_to_dynamodb(username, pickup_location, drop_location):
                 '#drop': 'Drop location'
             },
             ExpressionAttributeValues={
-                ':pickup_val': [pickup_location],  # Appends as a list
-                ':drop_val': [drop_location],      # Appends as a list
+                ':pickup_val': [pickup_location],  # Appends to the list
+                ':drop_val': [drop_location],      # Appends to the list
                 ':empty_list': []                 # Initializes the list if it doesn't exist
             },
             ReturnValues="UPDATED_NEW"  # Returns updated attributes
         )
-        #publish_message(get_topic_by_name('order_notify'), "Order placed successfully", subject="Order confirmation")
         print("Update succeeded:", response['Attributes'])
     except ClientError as e:
         print(f"Error updating item: {e.response['Error']['Message']}")
@@ -192,15 +187,15 @@ def get_user_orders(username):
     return orders
 
 
-
-def remove_element_from_db(username,index):
-    """
+"""
     Removes the second element from 'Pickup location' and 'Drop location' lists in a DynamoDB item.
     
     Args:
         table_name (str): The name of the DynamoDB table.
         username (str): The primary key (Username) of the item to update.
-    """
+"""
+def remove_element_from_db(username,index):
+    
     # Initialize DynamoDB resource
     dynamodb = boto3.resource('dynamodb')
     table = dynamodb.Table('Users')
@@ -209,21 +204,20 @@ def remove_element_from_db(username,index):
     key = {'Username': username}
 
     try:
-        # Step 1: Fetch the existing item
         response = table.get_item(Key=key)
         item = response.get('Item', {})
 
-        # Step 2: Check if 'Pickup location' and 'Drop location' exist and modify them
+        #Check if 'Pickup location' and 'Drop location' exist and modify them
         if 'Pickup location' in item and 'Drop location' in item:
             pickup_list = item['Pickup location']
             drop_list = item['Drop location']
 
             if len(pickup_list) > 0:
-                del pickup_list[index]  # Remove the second element (index 1)
+                del pickup_list[index]  
             if len(drop_list) > 0:
-                del drop_list[index]  # Remove the second element (index 1)
+                del drop_list[index]  
 
-            # Step 3: Update the item in DynamoDB
+            #Update the item in DynamoDB
             table.update_item(
                 Key=key,
                 UpdateExpression="SET #pickup = :new_pickup, #drop = :new_drop",
@@ -245,11 +239,8 @@ def remove_element_from_db(username,index):
     except Exception as e:
         print(f"Error updating item: {e}")
 
-# Usage example:
-#remove_second_element_from_lists('YourTableName', 'Abimanyu')
 
-def get_email_from_dynamodb(username, table_name='Users', region='us-east-1'):
-    """
+"""
     Retrieve the email address of a user from the DynamoDB table.
 
     Args:
@@ -259,7 +250,8 @@ def get_email_from_dynamodb(username, table_name='Users', region='us-east-1'):
 
     Returns:
     - str: The email address of the user, or None if the user doesn't exist.
-    """
+"""
+def get_email_from_dynamodb(username, table_name='Users', region='us-east-1'):
     # Initialize the DynamoDB resource
     dynamodb = boto3.resource('dynamodb', region_name=region)
     table = dynamodb.Table(table_name)
@@ -271,7 +263,6 @@ def get_email_from_dynamodb(username, table_name='Users', region='us-east-1'):
 
         if item:
             email = item['Email']
-            #email = item.get('Email', None)  # Retrieve the 'Email' field
             print(f"Email for {username}: {email}")
             return email
         else:
@@ -284,14 +275,14 @@ def get_email_from_dynamodb(username, table_name='Users', region='us-east-1'):
 def main():
     # Specify table name and AWS region
     table_name = "Users"
-    region = "us-east-1"  # Adjust to your region
+    region = "us-east-1"  
     
-    # Step 1: Create the DynamoDB table for user authentication
+    #  Create the DynamoDB table for user authentication
     # table = create_dynamodb_table(table_name, region)
     # if table:
     #     logger.info(f"Table '{table_name}' is ready for use.")
     
-    # Step 2: Add a sample user (for testing purposes)
+    #  Add a sample user 
     #add_user(table_name, "Abimanyu", "abimanyumurugan15@gmail.com", "admin", region)
     # add_user(table_name, "x23267062", "x23267062@student.ncirl.ie", "admin", region)
     # authenticate_dynamodb_user('x23267062','admin')

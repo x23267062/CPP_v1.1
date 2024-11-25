@@ -12,14 +12,12 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path , os
 import os
+import environ
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-AWS_ACCESS_KEY_ID = 'ASIAYYHPX4QPRCVZC3ZZ'
-AWS_SECRET_ACCESS_KEY = 'h7nTpNeKMEtgOJ37ecOZNc0tBiKdjzsv9bVVseZi'
-AWS_REGION_NAME = 'us-east-1'
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
@@ -134,8 +132,8 @@ STATIC_URL = 'static/'
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-import environ
-import os
+
+
 
 # Load environment variables
 env = environ.Env()
@@ -146,8 +144,6 @@ AWS_REGION = env('AWS_REGION', default='us-east-1')
 
 
 
-# Custom Login URL for Django's @login_required decorator
-#LOGIN_URL = 'login_view'
 
 # Optional logging settings for boto3 and botocore debugging
 LOGGING = {
@@ -172,6 +168,5 @@ LOGGING = {
     },
 }
 
-# Custom Authentication Backend (if using DynamoDB-based authentication)
-#AUTHENTICATION_BACKENDS = ['orders.backends.DynamoDBBackend']
+
 
