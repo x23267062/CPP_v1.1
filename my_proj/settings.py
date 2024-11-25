@@ -28,12 +28,12 @@ SECRET_KEY = 'django-insecure-0ahc*f%uwak8v$sc_md&kq_-uu2hrdb5q-&)!8yj1x9j7q&f%_
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '8723f3efaf59465581cc81a61567355f.vfs.cloud9.us-east-1.amazonaws.com']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '8723f3efaf59465581cc81a61567355f.vfs.cloud9.us-east-1.amazonaws.com','cppproj-env.eba-xmr3nxyc.us-east-1.elasticbeanstalk.com']
 APPEND_SLASH=False
 LOGIN_URL = 'login_view'
 
 CSRF_TRUSTED_ORIGINS = [
-    'https://8723f3efaf59465581cc81a61567355f.vfs.cloud9.us-east-1.amazonaws.com']
+    'https://8723f3efaf59465581cc81a61567355f.vfs.cloud9.us-east-1.amazonaws.com','https://cppproj-env.eba-xmr3nxyc.us-east-1.elasticbeanstalk.com']
 
 
 # Application definition
@@ -115,9 +115,11 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'US/Pacific'
 
 USE_I18N = True
+
+USE_L10N = True
 
 USE_TZ = True
 
