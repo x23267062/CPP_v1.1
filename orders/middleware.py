@@ -9,7 +9,7 @@ class AuthenticationMiddleware(MiddlewareMixin):
 
     def process_view(self, request, view_func, view_args, view_kwargs):
         # Skip the login and signup views
-        allowed_paths = ['login_view', 'signup_view', 'admin']  # Add any other allowed paths here
+        allowed_paths = ['login_view', 'signup_view', 'admin', '']  # Add  allowed paths here
         if request.path.strip('/').split('/')[0] in allowed_paths:
             return None
 
