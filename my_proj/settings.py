@@ -33,7 +33,7 @@ APPEND_SLASH=False
 LOGIN_URL = 'login_view'
 
 CSRF_TRUSTED_ORIGINS = [
-    'https://8723f3efaf59465581cc81a61567355f.vfs.cloud9.us-east-1.amazonaws.com','https://cppproj-env.eba-xmr3nxyc.us-east-1.elasticbeanstalk.com','https://172.31.86.101','https://35.168.57.155','https://54.88.30.133','*']
+    'https://8723f3efaf59465581cc81a61567355f.vfs.cloud9.us-east-1.amazonaws.com','https://cppproj-env.eba-xmr3nxyc.us-east-1.elasticbeanstalk.com','https://172.31.86.101','https://35.168.57.155','https://54.88.30.133','https://*']
 
 
 # Application definition
@@ -129,6 +129,7 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+STATIC_ROOT = 'static'
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
