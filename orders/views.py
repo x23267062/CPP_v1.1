@@ -8,6 +8,7 @@ from .sns import *
 from .lambda_utils import *
 #from update_db_pkg916 import update_db
 from update_db_pkg916.update_db import update_db
+from update_db_pkg9164.update_db import update_db
 from django.contrib.auth.models import User  # Django user model for session management
 from .forms import LoginForm, OrderForm
 from .dynamo_db_utils import *
@@ -86,7 +87,7 @@ def ship_now(request):
         invoke_lambda(json.dumps(values_data))
         
         #Updating the DynamoDB with new order
-        update_db.save_order_to_dynamodb(username, pickup_location, drop_location)
+        update_db.save_order_to_dynamodb('Users',username, pickup_location, drop_location, 'us-east-1')
         
         success_message = "Order placed successfully!"
         logger.info("\n\nUser placed order {}".format(success_message))
@@ -98,7 +99,7 @@ def order_list(request):
     username = request.session.get('username', 'User')
     
     #Gets a nested list of pickup and drop location from DB
-    user_orders = update_db.get_user_orders(username)
+    user_orders = update_db.get_user_orders('Users',username)
     return render(request, 'orders/order_list.html', {'orders': user_orders})
 
        
@@ -113,7 +114,7 @@ def delete(request,index):
         username = request.session.get('username', 'User')
         
         #Deletes pickup and drop location of particular index in DB
-        update_db.remove_element_from_db(username,index-1)
+        update_db.remove_element_from_db('Users',username,index-1)
     return redirect('order_list')
 
 
